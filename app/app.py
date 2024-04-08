@@ -15,8 +15,9 @@ class App:
         window = pygame.display.set_mode((800, 600))
 
         # Instantiating our objects
-        pipe_speed = 5
-        pipe = Pipe(window=window, height=300)
+        pipe = Pipe(window=window, height=300, speed=5)
+        pipe_speed = pipe.speed
+        acceleration = 1
         pipes = [pipe]
         dt = 40 # ms
         time_since_last_pipe = 0
@@ -35,16 +36,19 @@ class App:
             for pipe in pipes:
                 pipe.move()
 
-            #     if pipe.x < - pipe.width:
-            #         pipes.remove(pipe)
-            #         pipe.kill()
-
+            # Generating new pipes
             dist_since_last_pipe = (pipe_speed / dt) * time_since_last_pipe
             if dist_since_last_pipe >= dist_between_pipes:
                 new_pipe_height = rd.randint(50, window.get_height() - 50)
-                new_pipe = Pipe(window=window, height=new_pipe_height)
+                new_pipe = Pipe(window=window, height=new_pipe_height, speed=pipe_speed)
                 pipes.append(new_pipe)
                 time_since_last_pipe = 0
+                
+                # Accelerating to make the game harder and harder
+                for pipe in pipes:
+                    if pipe.is_current():
+                        pipe.accelerate(acceleration)
+                pipe_speed += acceleration
 
             
             pygame.display.flip() # Updating the window display
