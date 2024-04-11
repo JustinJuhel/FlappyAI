@@ -12,6 +12,7 @@ class Bird(pygame.sprite.Sprite):
         self.color = (255, 255, 255)
         self.x = 200
         self.diameter = 20
+        self.is_alive = True
 
         self.flap_force = -30
 
@@ -25,14 +26,22 @@ class Bird(pygame.sprite.Sprite):
         pygame.draw.circle(self.window, self.color, self.pos, self.diameter)
 
     def fly(self):
-        if self.vy >= - self.vy_max:
-            self.vy += self.gravity
-        self.height += self.vy
-        self.pos = (self.x, self.height)
+        if self.is_alive:
+            if self.vy >= - self.vy_max:
+                self.vy += self.gravity
+            self.height += self.vy
+            self.pos = (self.x, self.height)
+        else:
+            self.x -= self.speed
+            self.pos = (self.x, self.height)
         self.draw()  # draw the bird at its new position
+
 
     def flap(self):
         self.vy = self.flap_force # just reinitializing the vertical speed
 
     def accelerate(self, acceleration):
         self.speed += acceleration
+
+    def kill(self):
+        self.is_alive = False

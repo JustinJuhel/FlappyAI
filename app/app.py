@@ -7,6 +7,7 @@ import numpy as np
 from .pipe import Pipe
 from .bird import Bird
 from .floor import Floor
+from .bird_cloud import BirdCloud
 
 def dist(pt1, pt2):
     x1, y1 = pt1
@@ -32,7 +33,8 @@ class App:
         time_since_last_pipe = 0
         dist_between_pipes = 400
 
-        bird = Bird(window=window, speed=5, init_height=window.get_height() - 150)
+        n_birds = 10
+        cloud = BirdCloud(window, n_birds=n_birds)
 
         floor_height = 50
         floor = Floor(window=window, height=floor_height)
@@ -40,6 +42,7 @@ class App:
         display_start_message = True
         game_over = False
         display_end_message = False
+        ceiling_frontier = [(x, 0) for x in range(window.get_height())]
 
         # Creating a start message
         start_font = pygame.font.SysFont("Arial", 36)
@@ -61,19 +64,16 @@ class App:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    bird.flap()
+                    cloud.flap()
                 if event.type == pygame.MOUSEBUTTONDOWN and not game_running and not game_over:
-                    bird.flap()
+                    cloud.flap()
                     game_running = True
                     display_start_message = False
                     
                 
             window.fill((0, 0, 0))
 
-            if display_start_message:
-                window.blit(start_text, start_text_rect)
-            if display_end_message:
-                window.blit(end_text, end_text_rect)
+            
 
             floor.draw()
 
@@ -101,34 +101,47 @@ class App:
             
             # Drawing the bird
             if game_running:
-                bird.fly()
+                cloud.fly()
             else:
-                bird.draw() # if game over, the bird doesn't move but we still draw it
+                cloud.draw()
 
             # Collision
-            bird_position = bird.pos
-            pygame.draw.circle(window, (255, 0, 0), bird_position, 5)
-            frontier = floor.frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
-            # print(frontier)
-            # Drawing the frontier in red
-            for point in frontier:
-                pygame.draw.circle(window, (255, 0, 0), point, 2)
-            min_dist = min([dist(bird_position, pos) for pos in frontier]) # the minimal distance to a frontier
-            if min_dist <= bird.diameter: # if there is a collision
-                # print("/!\ COLLISION /!\ ")
+            for bird in cloud.birds:
+                bird_position = bird.pos
+                pygame.draw.circle(window, (255, 0, 0), bird_position, 5)
+                frontier = floor.frontier + ceiling_frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
+                # Drawing the frontier in red
+                for point in frontier:
+                    pygame.draw.circle(window, (255, 0, 0), point, 2)
+                min_dist = min([dist(bird_position, pos) for pos in frontier]) # the minimal distance to a frontier
+                if min_dist <= bird.diameter: # if there is a collision
+                    # print("/!\ COLLISION /!\ ")
+                    bird.kill()
+            if not True in [bird.is_alive for bird in cloud.birds]: # If no bird has survived
                 game_running = False
                 display_end_message = True
                 game_over = True
 
-
+            # Randomly flapping
+            if game_running:
+                # for bird in birds_cloud:
+                for i in range(n_birds):
+                    if rd.random() < 0.15: # 15% chance of flap
+                        print("flapping")
+                        cloud.flap(bird_index=i)
             # Performing actions depending on the key pressed
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE] and game_running:
-                bird.flap()
+                cloud.flap()
             if keys[pygame.K_SPACE] and not game_running and not game_over:
-                bird.flap()
+                cloud.flap()
                 game_running = True
                 display_start_message = False
+
+            if display_start_message:
+                window.blit(start_text, start_text_rect)
+            if display_end_message:
+                window.blit(end_text, end_text_rect)
 
             
             pygame.display.flip() # Updating the window display
