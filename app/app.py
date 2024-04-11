@@ -36,7 +36,23 @@ class App:
 
         floor_height = 50
         floor = Floor(window=window, height=floor_height)
+        game_running = False
+        display_start_message = True
         game_over = False
+        display_end_message = False
+
+        # Creating a start message
+        start_font = pygame.font.SysFont("Arial", 36)
+        start_text = start_font.render("Click or type Space to Start!", True, (0, 255, 0))
+
+        start_text_rect = start_text.get_rect()
+        start_text_rect.center = window.get_rect().center
+        # Creating an end message
+        end_font = pygame.font.SysFont("Arial", 36)
+        end_text = end_font.render("GAME OVER!", True, (0, 255, 0))
+
+        end_text_rect = end_text.get_rect()
+        end_text_rect.center = window.get_rect().center
 
         # PyGame events loop
         while True:
@@ -46,34 +62,45 @@ class App:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     bird.flap()
+                if event.type == pygame.MOUSEBUTTONDOWN and not game_running and not game_over:
+                    bird.flap()
+                    game_running = True
+                    display_start_message = False
+                    
                 
             window.fill((0, 0, 0))
+
+            if display_start_message:
+                window.blit(start_text, start_text_rect)
+            if display_end_message:
+                window.blit(end_text, end_text_rect)
 
             floor.draw()
 
             # Moving all our pipes and cancelling the ones that are out of screen
             for pipe in pipes:
-                if not game_over:
+                if game_running:
                     pipe.move()
                 else:
                     pipe.draw() # if game over, the pipe doesn't move but we still draw it
 
             # Generating new pipes
-            dist_since_last_pipe = (pipe_speed / dt) * time_since_last_pipe
-            if dist_since_last_pipe >= dist_between_pipes:
-                new_pipe_height = rd.randint(0, window.get_height() - 200 - floor_height)
-                new_pipe = Pipe(window=window, height=new_pipe_height, speed=pipe_speed)
-                pipes.append(new_pipe)
-                time_since_last_pipe = 0
-                
-                # Accelerating to make the game harder and harder
-                for pipe in pipes:
-                    if pipe.is_current():
-                        pipe.accelerate(acceleration)
-                pipe_speed += acceleration
+            if game_running:
+                dist_since_last_pipe = (pipe_speed / dt) * time_since_last_pipe
+                if dist_since_last_pipe >= dist_between_pipes:
+                    new_pipe_height = rd.randint(0, window.get_height() - 200 - floor_height)
+                    new_pipe = Pipe(window=window, height=new_pipe_height, speed=pipe_speed)
+                    pipes.append(new_pipe)
+                    time_since_last_pipe = 0
+                    
+                    # Accelerating to make the game harder and harder
+                    for pipe in pipes:
+                        if pipe.is_current():
+                            pipe.accelerate(acceleration)
+                    pipe_speed += acceleration
             
             # Drawing the bird
-            if not game_over:
+            if game_running:
                 bird.fly()
             else:
                 bird.draw() # if game over, the bird doesn't move but we still draw it
@@ -89,16 +116,23 @@ class App:
             min_dist = min([dist(bird_position, pos) for pos in frontier]) # the minimal distance to a frontier
             if min_dist <= bird.diameter: # if there is a collision
                 # print("/!\ COLLISION /!\ ")
+                game_running = False
+                display_end_message = True
                 game_over = True
 
 
             # Performing actions depending on the key pressed
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE] and not game_over:
+            if keys[pygame.K_SPACE] and game_running:
                 bird.flap()
+            if keys[pygame.K_SPACE] and not game_running and not game_over:
+                bird.flap()
+                game_running = True
+                display_start_message = False
 
             
             pygame.display.flip() # Updating the window display
             pygame.time.wait(dt) # Making the app run at 25 images per second
-            time_since_last_pipe += dt
+            if game_running:
+                time_since_last_pipe += dt
             
