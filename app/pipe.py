@@ -44,10 +44,12 @@ class Pipe(pygame.sprite.Sprite):
         self.x = round(self.x)
         self.height = round(self.height)
         # Updating the frontier with the current x and height
-        self.frontier = [
+        total_frontier = [
             (self.x, y) for y in range(self.height) # vertical frontier of the upper pipe
             ] + [
                 (self.x, y) for y in range(self.height + self.gap, self.window.get_height()) # vertical frontier of the lower pipe
                 ] + [
                     (x, y) for x in range(self.x, self.x + self.width) for y in [self.height, self.height + self.gap] # horizontal frontier of both pipes
                     ]
+        minimal_frontier = [total_frontier[i] for i in range(len(total_frontier)) if i % 10 == 0]
+        self.frontier = minimal_frontier

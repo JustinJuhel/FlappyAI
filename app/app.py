@@ -5,7 +5,7 @@ import itertools
 import numpy as np
 
 from .pipe import Pipe
-from .bird import Bird
+# from .bird import Bird
 from .floor import Floor
 from .bird_cloud import BirdCloud
 
@@ -33,7 +33,7 @@ class App:
         time_since_last_pipe = 0
         dist_between_pipes = 400
 
-        n_birds = 10
+        n_birds = 32
         cloud = BirdCloud(window, n_birds=n_birds)
 
         floor_height = 50
@@ -42,7 +42,7 @@ class App:
         display_start_message = True
         game_over = False
         display_end_message = False
-        ceiling_frontier = [(x, 0) for x in range(window.get_height())]
+        ceiling_frontier = [(200, 0)]
 
         # Creating a start message
         start_font = pygame.font.SysFont("Arial", 36)
@@ -106,7 +106,7 @@ class App:
                 cloud.draw()
 
             # Collision
-            for bird in cloud.birds:
+            for bird in cloud.bird_list:
                 bird_position = bird.pos
                 pygame.draw.circle(window, (255, 0, 0), bird_position, 5)
                 frontier = floor.frontier + ceiling_frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
@@ -117,7 +117,7 @@ class App:
                 if min_dist <= bird.diameter: # if there is a collision
                     # print("/!\ COLLISION /!\ ")
                     bird.kill()
-            if not True in [bird.is_alive for bird in cloud.birds]: # If no bird has survived
+            if not True in [bird.is_alive for bird in cloud.bird_list]: # If no bird has survived
                 game_running = False
                 display_end_message = True
                 game_over = True
@@ -127,7 +127,7 @@ class App:
                 # for bird in birds_cloud:
                 for i in range(n_birds):
                     if rd.random() < 0.15: # 15% chance of flap
-                        print("flapping")
+                        # print("flapping")
                         cloud.flap(bird_index=i)
             # Performing actions depending on the key pressed
             keys = pygame.key.get_pressed()
