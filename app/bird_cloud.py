@@ -9,9 +9,7 @@ class BirdCloud(pygame.sprite.Sprite):
         
         init_x, init_y, init_vy, init_is_alive = 200, 450, -30, 1
 
-        self.array = np.array([
-            [init_x, init_y, init_vy, init_is_alive] for _ in range(n_birds)
-        ])
+        self.array = np.array([[init_x, init_y, init_vy, init_is_alive] for _ in range(n_birds)])
         self.bird_color = (255, 255, 255)
         self.bird_diameter = 20
         self.gravity = 5
@@ -20,6 +18,9 @@ class BirdCloud(pygame.sprite.Sprite):
         self.vy_max = - 5 * self.flap_force
         self.gravity = 5
         self.horiz_speed = horiz_speed
+
+        self.genome_size = 240
+        self.genome = np.array((self.n_birds, self.genome_size))
     
     def draw(self):
         for params in self.array:

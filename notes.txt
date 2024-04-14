@@ -9,5 +9,68 @@ Inputs :
 - height of next pipe
 - horizontal distance of next pipe
 - self height
+- self vertical speed
 Output :
 - flap or not flap ? (at current time)
+
+
+Moi je veux pouvoir écrire model(X) (X = cloud.array) et obtenir un array de taille n_birds * 1 qui dit pour chaque bird si oui ou non il doit flap.
+
+A un moment donné dans l'entraînement il faudra comparer la prédiction avec la vraie réponse. Il faut donc définir la vraie réponse.
+
+Normaliser l'entrée pour faciliter l'apprentissage
+
+
+
+
+
+Idée pour strucutrer la donnée :
+Prendre en compte les étapes précédentes pour avoir un historique des actions menées.
+
+import numpy as np
+
+# Définir le nombre d'échantillons d'entraînement
+n_samples = 1000
+
+# Définir le nombre d'entrées du réseau de neurones
+n_inputs = 5
+
+# Définir le nombre de pas dans le temps
+n_steps = 4
+
+# Créer un tableau NumPy vide pour stocker les données d'entraînement
+training_data = np.zeros((n_samples, n_inputs, n_steps))
+
+# Remplir le tableau avec des données d'entraînement
+for i in range(n_samples):
+    # Générer des données aléatoires pour chaque entrée du réseau de neurones
+    distance_to_pipe = np.random.rand()
+    height_of_pipe = np.random.rand()
+    height_of_bird = np.random.rand()
+    vertical_speed = np.random.rand()
+    previous_inputs = np.random.rand(n_inputs, n_steps-1)
+
+    # Concaténer les entrées actuelles et les entrées des étapes précédentes
+    inputs = np.concatenate(([distance_to_pipe, height_of_pipe, height_of_bird, vertical_speed], previous_inputs), axis=1)
+
+    # Stocker les données d'entraînement dans le tableau
+    training_data[i] = inputs
+
+
+
+
+
+Idée : Utiliser un algorithme génétique, inspiré du principe de sélection naturelle.
+Initialiser une population d'oiseaux avec des paramètres (poids et biais du réseau de neurones) aléaoires, puis faire jouer les oiseaux et attribuer un score à chaque oiseau.
+Les oiseaux avec le score le plus élevé (les meilleurs 10% par exemple) sont sélectionnés pour se reproduire et générer une nouvelle génération.
+
+Etapes pour l'algorithme génétique :
+- Initialisation : je crée ma population d'oiseaux
+    Il faut définir comment le génome de l'oiseau modifie son réseau de neurones
+- Sélection : je fais jouer tous les oiseaux et je relève la distance parcourue par chacun avant sa mort
+    Je sélectionne les 10% meilleurs oiseaux pour la reproduction
+- Croisement : je crée une nouvelle génération en faisant des croisements entre les deux parents de chaque enfant
+    Chaque génération a la même population
+- Mutation (facultatif) : on modifie aléaoirement le génome des oiseaux
+- Remplacement : je remplace la génération précédente par la nouvelle génération, issue des meilleurs oiseaux de la génération précédente
+- Arrêt : j'arrête la simulation lorsqu'un nombre maximum de génération est atteint ou qu'une certaine performance est atteinte.

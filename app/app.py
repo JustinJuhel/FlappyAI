@@ -58,6 +58,11 @@ class App:
         end_text_rect = end_text.get_rect()
         end_text_rect.center = window.get_rect().center
 
+
+
+
+
+
         # PyGame events loop
         while True:
             for event in pygame.event.get():
@@ -70,11 +75,8 @@ class App:
                     cloud.flap(index=range(n_birds))
                     game_running = True
                     # display_start_message = False
-                    
-                
-            window.fill((0, 0, 0))
 
-            
+            window.fill((0, 0, 0))
 
             floor.draw()
 
@@ -106,7 +108,7 @@ class App:
             else:
                 cloud.draw()
 
-            # Collision FRO CLOUD
+            # Collision
             frontier = floor.frontier + ceiling_frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
             # Drawing the frontier in red
             for point in frontier:
@@ -134,12 +136,6 @@ class App:
                 game_running = True
                 # display_start_message = False
 
-            # if display_start_message:
-            #     window.blit(start_text, start_text_rect)
-            # if display_end_message:
-            #     window.blit(end_text, end_text_rect)
-
-            
             pygame.display.flip() # Updating the window display
             pygame.time.wait(dt) # Making the app run at 25 images per second
             if game_running:
