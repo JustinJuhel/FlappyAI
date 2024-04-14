@@ -1,0 +1,13 @@
+
+
+Making birds fitting in a np.array :
+
+
+Building the Neural Network :
+
+Inputs :
+- height of next pipe
+- horizontal distance of next pipe
+- self height
+Output :
+- flap or not flap ? (at current time)

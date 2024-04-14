@@ -33,8 +33,9 @@ class App:
         time_since_last_pipe = 0
         dist_between_pipes = 400
 
-        n_birds = 32
-        cloud = BirdCloud(window, n_birds=n_birds)
+        n_birds = 16
+        # cloud = BirdCloud(window, n_birds=n_birds)
+        cloud = BirdCloud(window, n_birds=n_birds, horiz_speed=pipe_speed)
 
         floor_height = 50
         floor = Floor(window=window, height=floor_height)
@@ -64,11 +65,11 @@ class App:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    cloud.flap()
+                    cloud.flap(index=range(n_birds))
                 if event.type == pygame.MOUSEBUTTONDOWN and not game_running and not game_over:
-                    cloud.flap()
+                    cloud.flap(index=range(n_birds))
                     game_running = True
-                    display_start_message = False
+                    # display_start_message = False
                     
                 
             window.fill((0, 0, 0))
@@ -105,21 +106,16 @@ class App:
             else:
                 cloud.draw()
 
-            # Collision
-            for bird in cloud.bird_list:
-                bird_position = bird.pos
-                pygame.draw.circle(window, (255, 0, 0), bird_position, 5)
-                frontier = floor.frontier + ceiling_frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
-                # Drawing the frontier in red
-                for point in frontier:
-                    pygame.draw.circle(window, (255, 0, 0), point, 2)
-                min_dist = min([dist(bird_position, pos) for pos in frontier]) # the minimal distance to a frontier
-                if min_dist <= bird.diameter: # if there is a collision
-                    # print("/!\ COLLISION /!\ ")
-                    bird.kill()
-            if not True in [bird.is_alive for bird in cloud.bird_list]: # If no bird has survived
+            # Collision FRO CLOUD
+            frontier = floor.frontier + ceiling_frontier + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
+            # Drawing the frontier in red
+            for point in frontier:
+                pygame.draw.circle(window, (255, 0, 0), point, 2)
+            cloud.kill(frontier)
+            if cloud.all_birds_dead():
+                # print("All birds are dead")
                 game_running = False
-                display_end_message = True
+                # display_end_message = True
                 game_over = True
 
             # Randomly flapping
@@ -128,20 +124,20 @@ class App:
                 for i in range(n_birds):
                     if rd.random() < 0.15: # 15% chance of flap
                         # print("flapping")
-                        cloud.flap(bird_index=i)
+                        cloud.flap(index=i)
             # Performing actions depending on the key pressed
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE] and game_running:
-                cloud.flap()
+                cloud.flap(index=range(n_birds))
             if keys[pygame.K_SPACE] and not game_running and not game_over:
-                cloud.flap()
+                cloud.flap(index=range(n_birds))
                 game_running = True
-                display_start_message = False
+                # display_start_message = False
 
-            if display_start_message:
-                window.blit(start_text, start_text_rect)
-            if display_end_message:
-                window.blit(end_text, end_text_rect)
+            # if display_start_message:
+            #     window.blit(start_text, start_text_rect)
+            # if display_end_message:
+            #     window.blit(end_text, end_text_rect)
 
             
             pygame.display.flip() # Updating the window display
