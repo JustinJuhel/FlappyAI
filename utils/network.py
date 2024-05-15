@@ -29,15 +29,17 @@ class BirdBrain(nn.Module):
         if self.genome is None: # if no genome is given, we initialize randomly the weights of the layers
             nn.init.xavier_uniform_(self.fc1.weight)
             nn.init.xavier_uniform_(self.fc2.weight)
+            # Updating the genome depending on the newly generated weights
+            self.genome = np.concatenate((self.fc1.weight.detach().numpy().reshape((-1,)), self.fc2.weight.detach().numpy().reshape((-1,))))
         else: # if a genome is given, we have to initialize the weights of the layers using it
-            # Assuming genome is a 1-D array of shape (n_connections,)
+            # Assuming genome is a 1-D array of shape (n_connections,1)
             n_inputs = 5
             n_hidden = 40
             n_outputs = 1
 
             # Splitting the genome into weights for each layer
-            weights1 = self.genome[:n_hidden * n_inputs].reshape(n_hidden, n_inputs)
-            weights2 = self.genome[n_hidden * n_inputs:n_hidden * n_inputs + n_outputs * n_hidden].reshape(n_outputs, n_hidden)
+            weights1 = self.genome[0][:n_hidden * n_inputs].reshape(n_hidden, n_inputs)
+            weights2 = self.genome[0][n_hidden * n_inputs:n_hidden * n_inputs + n_outputs * n_hidden].reshape(n_outputs, n_hidden)
 
             # Assigning the weights to the layers
             self.fc1.weight.data = torch.from_numpy(weights1)

@@ -74,3 +74,21 @@ Etapes pour l'algorithme génétique :
 - Mutation (facultatif) : on modifie aléaoirement le génome des oiseaux
 - Remplacement : je remplace la génération précédente par la nouvelle génération, issue des meilleurs oiseaux de la génération précédente
 - Arrêt : j'arrête la simulation lorsqu'un nombre maximum de génération est atteint ou qu'une certaine performance est atteinte.
+
+
+
+
+
+Il faut bien strucurer le problème, définir les opérations nécessaires pendant la phase de génération pour comprendre comment créer la population.
+Pour l'instant, oublier la partie interface graphique, reprendre les fonctions et créer des nouvelles classes (par exemple classe Population inspirée de la classe BirdCloud).
+
+Déroulement d'une génération :
+    On génère la population
+    On lance une boucle while true
+        On active le mouvement des oiseaux et des pipes
+        A chaque unité de temps les oiseaux on la possibilité de battre des aléaoires
+        Si un oiseau touche une frontière (sol, plafond ou pipe), il meurt
+        Quand tous les oiseaux sont morts, on sort de la bouche
+    On récupère le génome des 10% meilleurs oiseaux (ceux qui sont allés le plus loin)
+    On prépare la population suivante en faisant des crossovers de génomes et des mutations aléatoires
+    On recommence à la première étape

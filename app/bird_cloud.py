@@ -1,8 +1,10 @@
 import pygame
 import numpy as np
+# Our Modules
+from utils.network import BirdBrain
 
 class BirdCloud(pygame.sprite.Sprite):
-    def __init__(self, window, n_birds, horiz_speed):
+    def __init__(self, n_birds, horiz_speed, window=None):
         super().__init__()
         self.window = window
         self.n_birds = n_birds
@@ -20,7 +22,8 @@ class BirdCloud(pygame.sprite.Sprite):
         self.horiz_speed = horiz_speed
 
         self.genome_size = 240
-        self.genome = np.array((self.n_birds, self.genome_size))
+        self.genomes = np.array((self.genome_size, self.n_birds))
+        self.brains = np.array([BirdBrain(batch_size=n_birds, genome=genome) for genome in self.genomes])
     
     def draw(self):
         for params in self.array:
@@ -49,7 +52,8 @@ class BirdCloud(pygame.sprite.Sprite):
             self.array[:, 0]
         )
 
-        self.draw()
+        if self.window is not None:
+            self.draw()
 
     def flap(self, index):
         if not isinstance(index, list): # Making sure we work with a list (even of length 1)
