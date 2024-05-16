@@ -27,8 +27,11 @@ def main():
     floor_frontier = (200, window_height - floor_height)
     ceiling_frontier = (200, 0)
 
-    n_generations = 1
-    for _ in range(n_generations):
+    n_generations = 5
+    for i in range(n_generations):
+        print("#"*150)
+        print(f"GENERATION {i}")
+        print("#"*150)
         # Creating the Population
         print("Creating the Population")
         population = Population(n_birds=n_birds, genomes=genomes)
@@ -88,8 +91,8 @@ def main():
         # Getting the best birds' genomes
         print("Getting the best birds' genomes")
         selected_genomes = [population.brains[reproducer_index].genome for reproducer_index in reproducers]
-        print(f"selected_genomes: {selected_genomes}")
-        print(f"selected_genomes {type(selected_genomes)} of {type(selected_genomes[0])} of shape {selected_genomes[0].shape}")
+        # print(f"selected_genomes: {selected_genomes}")
+        # print(f"selected_genomes {type(selected_genomes)} of {type(selected_genomes[0])} of shape {selected_genomes[0].shape}")
 
         # Creating n_birds new genomes by crossing over the selected genomes
         print("Creating n_birds new genomes by crossing over the selected genomes")
@@ -110,18 +113,23 @@ def main():
 
         # Mutations on the newborns
         print("Mutations on the newborns")
-        mutated_genomes = new_genomes.copy()
-        for genome in mutated_genomes:
+        mutated_genomes = []
+        for genome in new_genomes:
+            min_val, max_val = min(genome), max(genome)
+            mutated_genome = genome.copy()
             for i in range(len(genome)):
-                min_val, max_val = min(genome), max(genomes)
                 if np.random.rand() < mutation_rate:
-                    genome[i] = np.random.uniform(min_val, max_val) # changing the value of the gene
+                    mutated_genome[i] = np.random.uniform(min_val, max_val) # changing the value of the gene
+            print(f"replacing old genome \n {genome} by the mutated genome \n {mutated_genome}.")
+            mutated_genomes.append(mutated_genome)
         
         # Creating the next generation
         print("Creating the next generation")
         genomes = mutated_genomes
-
-
+        print(type(genomes))
+        print(len(genomes))
+        print(type(genome[0]))
+        # print(genome[0].shape)
 
 
 
