@@ -18,7 +18,7 @@ def main():
     print(f"n_reproducers {n_reproducers}")
     reproducers = []
     genomes = None # Initial genome of the birds will be randomly generated
-    mutation_rate = 0.01
+    mutation_rate = 0.02
 
     dt = 40 # ms
     time_since_last_pipe = 0
@@ -27,7 +27,9 @@ def main():
     floor_frontier = (200, window_height - floor_height)
     ceiling_frontier = (200, 0)
 
-    n_generations = 5
+    max_distances = []
+
+    n_generations = 20
     for i in range(n_generations):
         print("#"*150)
         print(f"GENERATION {i}")
@@ -43,6 +45,9 @@ def main():
 
         # Used just for not choosing several times the same reproducers
         reproducers_selected = False
+
+        # Used to record the performance of the best bird of the current generation
+        max_dist = 0
 
         # Launching the Generation Simulation
         print("Launching the Generation Simulation")
@@ -60,6 +65,8 @@ def main():
                 time_since_last_pipe = 0
             # Making the birds fly
             population.fly()
+            # Updating the max_dist with the distance done after this time step
+            max_dist += pipe_speed * dt
             ###
             # MAKING THE BIRDS RANDOMLY FLAP FOR NOW, THEN WE WILL USE THE NEURAL NETWORK TO PILOT THE BIRDS
             # n_flaps = int(np.ceil(0.15 * n_birds))
@@ -120,16 +127,18 @@ def main():
             for i in range(len(genome)):
                 if np.random.rand() < mutation_rate:
                     mutated_genome[i] = np.random.uniform(min_val, max_val) # changing the value of the gene
-            print(f"replacing old genome \n {genome} by the mutated genome \n {mutated_genome}.")
+            # print(f"replacing old genome \n {genome} by the mutated genome \n {mutated_genome}.")
             mutated_genomes.append(mutated_genome)
+
+        # Printing the best distance
+        print(f"The best Bird of Generation {i} got to {max_dist}")
+        max_distances.append(max_dist)
         
         # Creating the next generation
         print("Creating the next generation")
         genomes = mutated_genomes
-        print(type(genomes))
-        print(len(genomes))
-        print(type(genome[0]))
-        # print(genome[0].shape)
+
+    print(f"Best Distances: {max_distances}")
 
 
 

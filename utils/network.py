@@ -38,8 +38,8 @@ class BirdBrain(nn.Module):
             n_outputs = 1
 
             # Splitting the genome into weights for each layer
-            weights1 = self.genome[0][:n_hidden * n_inputs].reshape(n_hidden, n_inputs)
-            weights2 = self.genome[0][n_hidden * n_inputs:n_hidden * n_inputs + n_outputs * n_hidden].reshape(n_outputs, n_hidden)
+            weights1 = self.genome[:n_hidden * n_inputs].reshape(n_hidden, n_inputs)
+            weights2 = self.genome[n_hidden * n_inputs:n_hidden * n_inputs + n_outputs * n_hidden].reshape(n_outputs, n_hidden)
 
             # Assigning the weights to the layers
             self.fc1.weight.data = torch.from_numpy(weights1)
