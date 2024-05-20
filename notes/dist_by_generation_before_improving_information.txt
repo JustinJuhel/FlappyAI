@@ -1,0 +1,16 @@
+For this image the neural networks have this information about the bird:
+- x
+- y
+- vy
+- dead or alive
+
+This is normal that there is no improvement, because the birds have to go through the pipes, but the neural network has no information about where is the next pipe.
+We can still notice that there is quite a learning: in the test, there is a certain distance before the first pipe. We see that at the beginning the birds die before event the first pipe.
+They probably always flap and reach the ceiling or never flap and fall on the floor.
+After the 5th generation, they seemed to have learned how to fly when there is no pipe.
+
+We need now to improve the information accessible to the neural network piloting each bird:
+- the x is useless
+- we need to keep the y and vy and also the 'dead or alive' state
+- we need to add the distance to the next pipe
+- we need to add the height of the next pipe

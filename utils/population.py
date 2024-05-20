@@ -2,6 +2,16 @@ import numpy as np
 # Our Modules
 from utils.network import BirdBrain
 
+'''
+This Function returns the distance between a bird and a given point.
+'''
+
+def dist(bird, point): # bird is structured as [x, y, vy, alive]
+    distance = np.sqrt((bird[0] - point[0]) ** 2 + (bird[1] - point[1]) ** 2)
+    return distance
+
+
+
 class Population:
     def __init__(self, n_birds, n_reproducers, genomes=None):
         self.n_birds = n_birds
@@ -35,6 +45,10 @@ class Population:
         # We start by taking n_reproducers random different birds from the available birds.
         self.reproducers = np.random.choice(np.arange(n_birds), size=self.n_reproducers, replace=False)
 
+    '''
+    This Function makes the birds fly, which means jsut fall.
+    There is a maximum fall speed.
+    '''
 
     def fly(self):
         alive_and_decent_speed = [(params[3] == 1 and params[2] >= - self.vy_max) for params in self.birds]
@@ -50,22 +64,13 @@ class Population:
             self.birds[:, 1] + self.birds[:, 2], # (modify y)
             self.birds[:, 1]
         )
-
-        dead = [(elt == 0) for elt in self.birds[:, 3]]
-        self.birds[:, 0] = np.where(
-            dead,
-            self.birds[:, 0] - self.horiz_speed,
-            self.birds[:, 0]
-        )
-
-        for bird in self.birds:
-            height = bird[1]
-            if height < 0 or height > 600:
-                print(f"""Bird escaped from the box.
-                      x = {bird[0]}
-                      y = {bird[1]}
-                      vy = {bird[2]}
-                      alive = {bird[3]}""")
+        
+    '''
+    This Function takes an index or a list of indices and makes the chosen birds flap.
+    For that we just have to set the vertical speed at a certain value corresponding to
+    the flap force of the birds. Then they will continue to fly (which means fall until
+    the next flap).
+    '''
 
     def flap(self, index):
         if not isinstance(index, list): # Making sure we work with a list (even of length 1)
@@ -74,31 +79,17 @@ class Population:
         for i in index: # Flapping some birds
             self.birds[i, 2] = self.flap_force
 
+    '''
+    This function kills the birds which have reached a frontier (floor, ceiling or a pipe)
+    It uses the function dist(bird, point) to determine the distance between the bird and
+    a given point and the get_collided_birds(global_frontier, floor_frontier,
+    ceiling_frontier) method to get the birds who are collided at the current state.
+    '''
+
     def kill(self, global_frontier, floor_frontier, ceiling_frontier): # frontier is a list of positions: [(x1, y1), (x2, y2), ...]
-        # Function to get the distance from a bird to a given point.
-        def dist(bird, point): # bird is structured as [x, y, vy, alive]
-            distance = np.sqrt((bird[0] - point[0]) ** 2 + (bird[1] - point[1]) ** 2)
-            return distance
-        # Function to get the birds that are collided at the current state.
-        def get_collided_birds(global_frontier=global_frontier, floor_frontier=floor_frontier, ceiling_frontier=ceiling_frontier):
-            for i, bird in enumerate(self.birds):
-                x, y = bird[0], bird[1]
-                # Looking if the bird is near a frontier point
-                if np.array([(dist(bird, point) <= self.bird_diameter) for point in global_frontier]).any():
-                    self.collided_birds[i] = 1
-                    if not self.collision_printed[i]:
-                        self.collision_printed[i] = True
-                        print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Collision")
-                # To be sure, verifying that the bird didn't escape from the box
-                if y > floor_frontier[1] or y < ceiling_frontier[1]:
-                    self.collided_birds[i] = 1
-                    if not self.collision_printed[i]:
-                        self.collision_printed[i] = True
-                        print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Escaped from box")
-            return self.collided_birds
         # Creating a condition: the birds that are alive but also collided (and will die)
         alive = [bird[3] for bird in self.birds]
-        collided_birds = get_collided_birds()
+        collided_birds = self.get_collided_birds(global_frontier, floor_frontier, ceiling_frontier)
         alive_and_collision = alive and collided_birds
         # Killing the chosen birds
         self.birds[:, 3] = np.where(
@@ -112,6 +103,31 @@ class Population:
             self.reproducers = np.random.choice(birds_alive, size=self.n_reproducers, replace=False)
         # We return the reproducers to have access to them in the main program
         return self.reproducers
+    
+    '''
+    This Function takes the frontier in argument and returns the birds which are collided at the current state.
+    '''
+    
+    def get_collided_birds(self, global_frontier, floor_frontier, ceiling_frontier):
+        for i, bird in enumerate(self.birds):
+            x, y = bird[0], bird[1]
+            # Looking if the bird is near a frontier point
+            if np.array([(dist(bird, point) <= self.bird_diameter) for point in global_frontier]).any():
+                self.collided_birds[i] = 1
+                if not self.collision_printed[i]:
+                    self.collision_printed[i] = True
+                    print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Collision")
+            # To be sure, verifying that the bird didn't escape from the box
+            if y > floor_frontier[1] or y < ceiling_frontier[1]:
+                self.collided_birds[i] = 1
+                if not self.collision_printed[i]:
+                    self.collision_printed[i] = True
+                    print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Escaped from box")
+        return self.collided_birds
+    
+    '''
+    This Function returns a boolean to determine if all birds are dead. Used to stop the test of a generation.
+    '''
     
     def all_birds_dead(self):
         return not self.birds[:, 3].any()
