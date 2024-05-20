@@ -3,6 +3,7 @@ import random as rd
 import itertools
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 from utils.population import Population
 from utils.pipe import Pipe
@@ -17,7 +18,7 @@ def main():
     n_birds = 32 # Number of birds in our population
     n_reproducers = int(np.ceil(0.10 * n_birds)) # Number of birds that are allowed to reproduce
     print(f"n_reproducers {n_reproducers}")
-    reproducers = []
+    # reproducers = []
     genomes = None # Initial genome of the birds will be randomly generated
     mutation_rate = 0.02
 
@@ -37,8 +38,8 @@ def main():
         print("#"*150)
         # Creating the Population
         print("Creating the Population")
-        population = Population(n_birds=n_birds, genomes=genomes)
-        # Generating the Pipes
+        population = Population(n_birds=n_birds, n_reproducers=n_reproducers, genomes=genomes)
+        # Generating the Pipes²
         print("Generating the Pipes")
         pipe1 = Pipe(window_dim=(window_width, window_height), height=300)
         pipe_speed = pipe1.speed
@@ -103,22 +104,22 @@ def main():
             # Collision
             global_frontier = [floor_frontier] + [ceiling_frontier] + list(itertools.chain(*[curr_pipe.frontier for curr_pipe in pipes])) # concatenating all the frontiers
             # print(f"frontier {frontier}")
-            population.kill(global_frontier, floor_frontier, ceiling_frontier)
+            reproducers = population.kill(global_frontier, floor_frontier, ceiling_frontier)
 
             # Getting the 10% best birds' indices
             # It can be possible to never have exactly n_reproducers alive at the same time.
             # If it is not the case I duplicate the chosen reproducers until I have the right number of reproducers.
-            print(f"Nb Birds Alive: {sum(population.birds[:, 3])}")
-            if (sum(population.birds[:, 3]) <= n_reproducers) and (not reproducers_selected):
-                reproducers = np.where(population.birds[:, 3] == 1)[0]
-                # If we have not chosen enough reproducers
-                while len(reproducers) < n_reproducers:
-                    print("Duplicating some reproducers")
-                    duplicate_index = rd.randint(0, len(reproducers) - 1)
-                    reproducer_to_duplicate = reproducers[duplicate_index]
-                    reproducers = np.insert(reproducers, len(reproducers), reproducer_to_duplicate)
-                print(f"Selecting our reproducers: {reproducers}")
-                reproducers_selected = True                
+            # print(f"Nb Birds Alive: {sum(population.birds[:, 3])}")
+            # if (sum(population.birds[:, 3]) <= n_reproducers) and (not reproducers_selected):
+            #     reproducers = np.where(population.birds[:, 3] == 1)[0]
+            #     # If we have not chosen enough reproducers
+            #     while len(reproducers) < n_reproducers:
+            #         print("Duplicating some reproducers")
+            #         duplicate_index = rd.randint(0, len(reproducers) - 1)
+            #         reproducer_to_duplicate = reproducers[duplicate_index]
+            #         reproducers = np.insert(reproducers, len(reproducers), reproducer_to_duplicate)
+            #     print(f"Selecting our reproducers: {reproducers}")
+            #     reproducers_selected = True                
 
             # Condition for stopping the simulation
             running = False if population.all_birds_dead() else True
@@ -202,7 +203,7 @@ def main():
             mutated_genomes.append(mutated_genome)
 
         # Printing the best distance
-        print(f"The best Bird of Generation {i} got to {max_dist}")
+        print(f"The best Bird of Generation {i} achieved a distance of {max_dist}")
         max_distances.append(max_dist)
         
         # Creating the next generation
@@ -211,8 +212,9 @@ def main():
 
     print(f"Best Distances: {max_distances}")
 
-
-
+    # plt.plot(max_distances)
+    plt.plot(max_distances, 'o-')
+    plt.show()
 
 
 

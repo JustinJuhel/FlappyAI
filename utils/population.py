@@ -3,7 +3,7 @@ import numpy as np
 from utils.network import BirdBrain
 
 class Population:
-    def __init__(self, n_birds, genomes=None):
+    def __init__(self, n_birds, n_reproducers, genomes=None):
         self.n_birds = n_birds
         self.genomes = genomes
 
@@ -31,6 +31,9 @@ class Population:
         self.collided_birds = [0 for bird in self.birds]
         self.collision_printed = [False for bird in self.birds]
 
+        self.n_reproducers = n_reproducers
+        # We start by taking n_reproducers random different birds from the available birds.
+        self.reproducers = np.random.choice(np.arange(n_birds), size=self.n_reproducers, replace=False)
 
 
     def fly(self):
@@ -72,16 +75,12 @@ class Population:
             self.birds[i, 2] = self.flap_force
 
     def kill(self, global_frontier, floor_frontier, ceiling_frontier): # frontier is a list of positions: [(x1, y1), (x2, y2), ...]
+        # Function to get the distance from a bird to a given point.
         def dist(bird, point): # bird is structured as [x, y, vy, alive]
             distance = np.sqrt((bird[0] - point[0]) ** 2 + (bird[1] - point[1]) ** 2)
-            # if distance < self.bird_diameter:
-            #     print(f"bird {bird} died")
             return distance
-        
+        # Function to get the birds that are collided at the current state.
         def get_collided_birds(global_frontier=global_frontier, floor_frontier=floor_frontier, ceiling_frontier=ceiling_frontier):
-            # birds = self.birds
-            # collided_birds = [0 for bird in birds]
-            # collision_printed = [False for bird in birds]
             for i, bird in enumerate(self.birds):
                 x, y = bird[0], bird[1]
                 # Looking if the bird is near a frontier point
@@ -92,34 +91,27 @@ class Population:
                         print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Collision")
                 # To be sure, verifying that the bird didn't escape from the box
                 if y > floor_frontier[1] or y < ceiling_frontier[1]:
-                    # print(f"Bird {i} escaped from box so we kill it.")
                     self.collided_birds[i] = 1
                     if not self.collision_printed[i]:
                         self.collision_printed[i] = True
                         print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Escaped from box")
             return self.collided_birds
-
-        alive_and_collision = [(bird[3] and np.array([(dist(bird, point) <= self.bird_diameter) for point in global_frontier]).any()) for bird in self.birds]
-        # print(f"in population.py line 73: alive_and_collision = {alive_and_collision}")
-
+        # Creating a condition: the birds that are alive but also collided (and will die)
         alive = [bird[3] for bird in self.birds]
-        collision = [np.array([(dist(bird, point) <= self.bird_diameter) for point in global_frontier]).any() for bird in self.birds]
-        alive_and_collision_2 = alive and collision
-
         collided_birds = get_collided_birds()
-        alive_and_collision_3 = alive and collided_birds
-
-        # print(f"population.py: alive = {alive}")
-        # print(f"population.py: collision = {collision}")
-        # print(f"population.py: collided_birds = {collided_birds}")
-        # print(f"population.py: alive_and_collision = {alive_and_collision_2}")
-        # print(f"alive_and_collision was good computed: {alive_and_collision == alive_and_collision_2}")
-
+        alive_and_collision = alive and collided_birds
+        # Killing the chosen birds
         self.birds[:, 3] = np.where(
-            alive_and_collision_3,
+            alive_and_collision,
             0,
             self.birds[:, 3]
         )
+        # Updating the reproducers
+        birds_alive = np.where(self.birds[:, 3] == 1)[0]  # Getting the indices of the birds which are still alive
+        if len(birds_alive) >= self.n_reproducers:  # If there is n_reproducers or more remaining birds, we take random birds among them
+            self.reproducers = np.random.choice(birds_alive, size=self.n_reproducers, replace=False)
+        # We return the reproducers to have access to them in the main program
+        return self.reproducers
     
     def all_birds_dead(self):
         return not self.birds[:, 3].any()
