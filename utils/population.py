@@ -19,11 +19,13 @@ class Population:
         self.gravity = 5
         self.horiz_speed = 7
 
-        self.genome_size = 240
+        print("Population -> __init__ : initialising the brains of the birds")
+        self.genome_size = 200
         if genomes is not None:
             self.brains = np.array([BirdBrain(batch_size=n_birds, genome=genome) for genome in self.genomes])
         else:
-            self.brains = np.array([BirdBrain(batch_size=n_birds, genome=None) for _ in range(self.genome_size)])
+            # self.brains = np.array([BirdBrain(batch_size=n_birds, genome=None) for _ in range(self.genome_size)])
+            self.brains = np.array([BirdBrain(batch_size=n_birds, genome=None) for _ in range(n_birds)])
             self.genomes = np.array([brain.genome for brain in self.brains])
 
         self.collided_birds = [0 for bird in self.birds]
@@ -76,8 +78,6 @@ class Population:
             #     print(f"bird {bird} died")
             return distance
         
-        
-        
         def get_collided_birds(global_frontier=global_frontier, floor_frontier=floor_frontier, ceiling_frontier=ceiling_frontier):
             # birds = self.birds
             # collided_birds = [0 for bird in birds]
@@ -114,7 +114,6 @@ class Population:
         # print(f"population.py: collided_birds = {collided_birds}")
         # print(f"population.py: alive_and_collision = {alive_and_collision_2}")
         # print(f"alive_and_collision was good computed: {alive_and_collision == alive_and_collision_2}")
-
 
         self.birds[:, 3] = np.where(
             alive_and_collision_3,
