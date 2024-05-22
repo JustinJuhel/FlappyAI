@@ -1,0 +1,5 @@
+I'm still not satisfied about the performances.
+
+It'es obvious that there is an improvement but this simulation ran for 8 hours and barely got to more than 100 pipes.
+
+Maybe the bids have a too simple brain to catch the complexity of the situation. Let's complexify their brain.

@@ -1,0 +1,5 @@
+On this graph we see the max distance reached for each generation for 50 generations.
+
+We see some really good scores compared to the first generations, but some generations are still performing bad even after several dozens of iterations.
+
+Maybe to understand better the result we could plot the number of pipes passed instead of the distance.

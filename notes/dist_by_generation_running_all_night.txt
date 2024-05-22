@@ -1,0 +1,4 @@
+In this example we have 225 generations and we see a clear improvement in the last generations compared to the first ones.
+Still the performance looks unstable. It may be due to the size of the group of birds.
+In this example we have a population of 3é birds, and we take 10% of them as reproducers, which means 4 birds.
+Let's try the same simulation with 64 birds.

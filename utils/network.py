@@ -17,7 +17,7 @@ class BirdBrain(nn.Module):
         self.fc1 = nn.Linear(4, 40)
         self.fc2 = nn.Linear(40, 1)
         self.network = nn.Sequential(
-            nn.Linear(4, 120),
+            nn.Linear(6, 120),
             nn.ReLU(),
             nn.Linear(120, 120),
             nn.ReLU(),
@@ -60,6 +60,15 @@ class BirdBrain(nn.Module):
     This Function takes a (4,)-shaped array in input and returns the response of the bird's brain,which is juste one numerical value
     '''
 
-    def get_response(self, input):
-        t_input = torch.Tensor(input)
+    def get_response(self, input, next_pipe_dist, next_pipe_height):
+        if len(input.shape) == 1:
+            input_extended = np.concatenate((
+                input,
+                np.reshape(np.array(next_pipe_dist), (1,)),  # Getting a (1,)-shaped array from an integer.
+                np.reshape(np.array(next_pipe_height), (1,)),  # Getting a (1,)-shaped array from an integer.
+            ))
+        else:
+            col_ones = np.ones_like(input[:, 0:1])  # We create a column array full of 1 of the same length as the columns of the input
+            input_extended = np.concatenate((input, col_ones * next_pipe_dist, col_ones * next_pipe_height), axis=1)
+        t_input = torch.Tensor(input_extended)
         return self(t_input)

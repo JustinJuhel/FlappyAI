@@ -1,0 +1,7 @@
+In this 9 hour long simulation we have a population of 64 birds and 10% reproducers.
+
+The most distances are still bad, it is not improving smoothly.
+
+Do we need a veeeery large population? Do we need to reduce the proportion of reproducers?
+
+Let's try with a population of 128 birds and 5% reproducers (which means 7 reproducers, like before).

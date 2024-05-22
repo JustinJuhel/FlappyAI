@@ -116,13 +116,13 @@ class Population:
                 self.collided_birds[i] = 1
                 if not self.collision_printed[i]:
                     self.collision_printed[i] = True
-                    print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Collision")
+                    # print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Collision")
             # To be sure, verifying that the bird didn't escape from the box
             if y > floor_frontier[1] or y < ceiling_frontier[1]:
                 self.collided_birds[i] = 1
                 if not self.collision_printed[i]:
                     self.collision_printed[i] = True
-                    print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Escaped from box")
+                    # print(f"Bird {i} collided. Last Position: {(x, y)}. Cause: Escaped from box")
         return self.collided_birds
     
     '''

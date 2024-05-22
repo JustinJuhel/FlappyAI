@@ -1,0 +1,2 @@
+On this simulation we have 128 birds and 5% reproducers, which means as many as before. We see better the improvement and quicker (after 125 generations).
+Let's try again with 256 birds and 2.5% reproducers
