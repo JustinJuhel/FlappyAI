@@ -17,11 +17,7 @@ class BirdBrain(nn.Module):
         self.fc1 = nn.Linear(4, 40)
         self.fc2 = nn.Linear(40, 1)
         self.network = nn.Sequential(
-            nn.Linear(6, 120),
-            nn.ReLU(),
-            nn.Linear(120, 120),
-            nn.ReLU(),
-            nn.Linear(120, 32),
+            nn.Linear(6, 32),
             nn.ReLU(),
             nn.Linear(32, 1)
         )
