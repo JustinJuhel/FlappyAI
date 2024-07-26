@@ -22,6 +22,7 @@ class BirdBrain(nn.Module):
             nn.Linear(32, 1)
         )
 
+
         self.genome = genome  # This is a Python Dictionary contianing all the weights and bias of all layers.
         self.generate_network()
     

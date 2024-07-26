@@ -1,3 +1,4 @@
+[[AI]]
 # FlappyAI
   
 ## Introduction
@@ -24,3 +25,14 @@ The Genetic Algorithm continues to evolve the population of solutions over time,
 To make my code clearer I used Object-Oriented Programming and created several classes like `Population`, `Pipe`, and `BirdBrain` (inheriting from `nn.Module`).
   
 Object-Oriented Programming (OOP) in Python allows you to create classes, which are blueprints for creating objects. Objects are instances of classes and can have attributes (data) and methods (functions) associated with them. OOP in Python provides a way to structure and organize code, making it easier to manage and maintain large codebases. It also allows for the creation of reusable and extensible components, which can be used in a variety of applications. Key concepts include classes, objects, attributes, methods, encapsulation, inheritance, and polymorphism.
+## A Bird's Brain
+As explained before, the birds are equipped with a simple neural network representing their brain. The inputs of these models are the **height of the next pipe**, the **horizontal distance of the next pipe**, the **bird's height** and the **bird's vertical speed**, and the models output is if yes or no the bird should flap at the current time (so 0 or 1). The network is just composed of several groups of a fully connected layer followed by an activation layer (with the ReLU function).
+## Tests and Measures
+To test our system and see if the birds are really learning how to play Flappy Bird, we can play on several main parameters: the duration of simulation, the **number of birds** in our population, the **percentage of reproducers** that we choose, that is the percentage of the best birds that we allow to reproduce to generate the next population, and finally the birds' brain structure.
+
+Intuitively, we should observe a better performance after a longer simulation. Also, the bigger the population is, the higher the number of created pipes should be. Concerning the percentage of reproducers it is more complicated because taking a too high percentage would allow non performing birds to reproduce, whereas if we take a too small amount of birds, the whole next generation will be generated out of only a few birds, which could introduce a lack of diversity in their genomes. For the brain structure, it is difficult to guess its influence on the birds' capacity to learn. We will try to complexify and simplify it to compare the results.
+
+For the first simulations, the only parameters I modified were the population size, the percentage of reproducers and the duration of simulation.
+### Simulation 1
+256 birds, 2.5% of reproducers (that is the 7 best performing birds)
+
